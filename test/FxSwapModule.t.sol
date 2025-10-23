@@ -3,9 +3,9 @@ pragma solidity ^0.8.28;
 
 import "safe-contracts/contracts/Safe.sol";
 import {FxSwapModule} from "../src/FxSwapModule.sol";
-import {MockERC20} from "./utils/MockERC20.sol";
 import {SafeUtils} from "./utils/SafeUtils.t.sol";
 import {IFxSwapModule} from "../src/interfaces/IFxSwapModule.sol";
+import {MockERC20} from "../src/mocks/MockERC20.sol";
 import {console} from "forge-std/console.sol";
 
 contract FxSwapModuleTest is SafeUtils {
@@ -44,24 +44,11 @@ contract FxSwapModuleTest is SafeUtils {
 
         PYUSD.approve(address(fxSwapModule), amount);
 
-        IFxSwapModule.BrokerParam[]
-            memory brokerParams = new IFxSwapModule.BrokerParam[](1);
+        IFxSwapModule.BrokerParam[] memory brokerParams = new IFxSwapModule.BrokerParam[](1);
 
-        brokerParams[0] = IFxSwapModule.BrokerParam(
-            address(broker),
-            amount,
-            fxRate,
-            deadline,
-            bytes("")
-        );
+        brokerParams[0] = IFxSwapModule.BrokerParam(address(broker), amount, fxRate, deadline, bytes(""));
 
-        bytes memory signature = brokerSignFxRate(
-            fxSwapModule,
-            address(PYUSD),
-            address(XSGD),
-            user,
-            brokerParams[0]
-        );
+        bytes memory signature = brokerSignFxRate(fxSwapModule, address(PYUSD), address(XSGD), user, brokerParams[0]);
 
         brokerParams[0].signature = signature;
 
@@ -89,38 +76,15 @@ contract FxSwapModuleTest is SafeUtils {
 
         PYUSD.approve(address(fxSwapModule), 200 ether);
 
-        IFxSwapModule.BrokerParam[]
-            memory brokerParams = new IFxSwapModule.BrokerParam[](2);
+        IFxSwapModule.BrokerParam[] memory brokerParams = new IFxSwapModule.BrokerParam[](2);
 
-        brokerParams[0] = IFxSwapModule.BrokerParam(
-            address(broker),
-            100 ether,
-            125e16,
-            block.timestamp + 1 minutes,
-            bytes("")
-        );
-        brokerParams[1] = IFxSwapModule.BrokerParam(
-            address(broker2),
-            100 ether,
-            127e16,
-            block.timestamp + 1 minutes,
-            bytes("")
-        );
+        brokerParams[0] =
+            IFxSwapModule.BrokerParam(address(broker), 100 ether, 125e16, block.timestamp + 1 minutes, bytes(""));
+        brokerParams[1] =
+            IFxSwapModule.BrokerParam(address(broker2), 100 ether, 127e16, block.timestamp + 1 minutes, bytes(""));
 
-        bytes memory signature = brokerSignFxRate(
-            fxSwapModule,
-            address(PYUSD),
-            address(XSGD),
-            user,
-            brokerParams[0]
-        );
-        bytes memory signature2 = brokerSignFxRate(
-            fxSwapModule,
-            address(PYUSD),
-            address(XSGD),
-            user,
-            brokerParams[1]
-        );
+        bytes memory signature = brokerSignFxRate(fxSwapModule, address(PYUSD), address(XSGD), user, brokerParams[0]);
+        bytes memory signature2 = brokerSignFxRate(fxSwapModule, address(PYUSD), address(XSGD), user, brokerParams[1]);
 
         brokerParams[0].signature = signature;
         brokerParams[1].signature = signature2;
