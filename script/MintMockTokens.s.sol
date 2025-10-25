@@ -8,19 +8,19 @@ import {MockERC20} from "../src/mocks/MockERC20.sol";
 
 contract MintMockTokens is Script {
     function run() external {
-        if (block.chainId != 11155111) {
+        if (block.chainid != 11155111) {
             revert("Only on Sepolia");
         }
 
         uint256 pk = vm.envUint("PRIVATE_KEY");
-        address to = vm.envAddress("TO");
-        address token = 0x8A0c939571ef36363a5B4526A28aC59f623ebf97;
+        address to = 0xF16bD86AC718886F0550689A574D4552dEC0253E; // deployed broker's safe address
+        address token = 0x8A0c939571ef36363a5B4526A28aC59f623ebf97; // deployed MockXSGD address
         uint256 amount = 100 ether;
 
         vm.startBroadcast(pk);
         MockERC20(token).mint(to, amount);
         vm.stopBroadcast();
 
-        console.log("Minted", amount, "token", token, "to", to);
+        console.log("Minted", amount);
     }
 }
