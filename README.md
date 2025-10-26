@@ -1,66 +1,84 @@
-## Foundry
+## FX Swap Safe Module
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A Gnosis Safe module that enables trust‑minimized FX swaps using off‑chain brokers.
 
-Foundry consists of:
+## Contract addresses
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### Sepolia
 
-## Documentation
+- FxSwapModule: `0x091E1C4c0c4e184D90117Cb51436D4d661f138A3`
+- MockXSGD: `0x8A0c939571ef36363a5B4526A28aC59f623ebf97`
+- PYUSD/MockXSGD broker : `0xF16bD86AC718886F0550689A574D4552dEC0253E`
 
-https://book.getfoundry.sh/
+## Development
 
-## Usage
+### Setup
+
+```bash
+forge install
+```
 
 ### Build
 
-```shell
-$ forge build
+```bash
+forge build
 ```
 
 ### Test
 
-```shell
-$ forge test
+```bash
+forge test -vv
 ```
 
-### Format
+## Scripts (Foundry)
 
-```shell
-$ forge fmt
+All scripts require `PRIVATE_KEY` in `.env` and a valid `--rpc-url`.
+
+### Env variables
+
+```bash
+PRIVATE_KEY=
 ```
 
-### Gas Snapshots
+### Deploy module
 
-```shell
-$ forge snapshot
+```bash
+forge script script/DeployFxSwap.s.sol:DeployFxSwap --rpc-url $RPC_URL --broadcast -vvvv
 ```
 
-### Anvil
+The deployed address is recorded at `broadcast/DeployFxSwap.s.sol/<chainId>/run-latest.json`.
 
-```shell
-$ anvil
+### Deploy mock tokens
+
+```bash
+forge script script/DeployMocks.s.sol:DeployMocks --rpc-url $RPC_URL --broadcast -vvvv
 ```
 
-### Deploy
+### Mint mock tokens
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```bash
+forge script script/MintMockTokens.s.sol:MintMockTokens --rpc-url $RPC_URL --broadcast -vvvv
 ```
 
-### Cast
+Note: `to`, `token`, and `amount` are hardcoded in `script/MintMockTokens.s.sol`. Edit that file to change values.
 
-```shell
-$ cast <subcommand>
+### Create a Safe (Sepolia)
+
+```bash
+forge script script/CreateSafe.s.sol:CreateSafe --rpc-url $RPC_URL --broadcast -vvvv
 ```
 
-### Help
+Outputs the new Safe address.
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+### Enable FxSwap module on an existing Safe
+
+```bash
+forge script script/EnableModuleOnSafe.s.sol:EnableModuleOnSafe --rpc-url $RPC_URL --broadcast -vvvv
 ```
+
+Note: `safeAddr` and `module` are hardcoded in `script/EnableModuleOnSafe.s.sol`. Edit that file to point to your Safe and deployed module addresses.
+
+Requirements:
+
+- `PRIVATE_KEY` must be an owner of `SAFE`.
+- Threshold should be 1 for single‑owner flow (or provide N ordered signatures if higher).
