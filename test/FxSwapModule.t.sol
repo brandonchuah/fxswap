@@ -17,7 +17,6 @@ contract FxSwapModuleTest is SafeUtils {
     Safe public broker2;
 
     // User details
-
     uint256 public pkUser = vm.randomUint();
     address public user = payable(vm.addr(pkUser));
 
